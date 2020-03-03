@@ -31,13 +31,18 @@ class JavaClass:
         classStr = self.getHeader()
 
         classStr += self.getLengthLine()
+        
         fieldDeclarations = ""
+        getMethodFields = ""
         for field in self.fields:
-            fieldDeclarations += field.getDeclarationString() + "\n"
+            fieldDeclarations += field.getDeclarationString()
+            getMethodFields += field.getGetBytesString()
 
         classStr += fieldDeclarations
         
         classStr += "\n" + self.getConstructor()
+
+        classStr += self.getGetBytesLine(getMethodFields)
         
         classStr += (self.indentLevel * "    ") + "}"
         return classStr
@@ -51,30 +56,40 @@ class JavaClass:
         return retStr
 
     def getLengthLine(self):
-        return ((self.indentLevel + 1) * "    ") + "public static final int legth = " +\
+        return ((self.indentLevel + 1) * "    ") +\
+               "public static final int length = " +\
                str(self.baseLength) + ";\n\n"
     
     def getConstructor(self):
         return ((self.indentLevel + 1) * "    ") + "public " + self.name + "() {}\n\n"
 
+    def getGetBytesLine(self, fields):
+        retVal = ((self.indentLevel + 1) * "    ")
+        retVal += "public getBytes(ByteBuffer bb) {\n"
+        retVal += fields
+        retVal += ((self.indentLevel + 1) * "    ")
+        retVal += "}\n"
+        return retVal
+        
 ##Python 2 Class definition
 ##class Field(object):
 class Field:
 
     typeDict = {
-    "integer":{"type":"int", "access":"public", "length":4},
-    "short":{"type":"short", "access":"public", "length":2},
-    "float":{"type":"float", "access":"public", "length":4},
-    "uinteger":{"type":"int", "access":"public", "length":4},
-    "ushort":{"type":"int", "access":"public", "length":2},
-    "spare":{"type":"int", "access":"private final", "length":None},
-    "String":{"type":"String", "access":"public", "length":None},
-    "byte":{"type":"byte", "access":"public", "length":1}
+        "integer":{"type":"int", "access":"public", "length":4},
+        "short":{"type":"short", "access":"public", "length":2},
+        "float":{"type":"float", "access":"public", "length":4},
+        "uinteger":{"type":"int", "access":"public", "length":4},
+        "ushort":{"type":"int", "access":"public", "length":2},
+        "spare":{"type":"int", "access":"private final", "length":None},
+        "String":{"type":"String", "access":"public", "length":None},
+        "byte":{"type":"byte", "access":"public", "length":1}
     }
 
     def __init__(self, name, datatype, length, indentLevel):
         self.name = Field.getValidName(name, datatype)
-        self.datatype = Field.findType(datatype)
+        self.fieldtype = datatype
+        self.declaretype = Field.findType(datatype)
         self.accessLevel = Field.findAccessLevel(datatype)
         self.length = Field.findLength(datatype, length)
         self.indentLevel = indentLevel
@@ -82,17 +97,41 @@ class Field:
     def getDeclarationString(self):
         fieldStr = (self.indentLevel * "    ")
         fieldStr += self.accessLevel + " "
-        fieldStr += self.datatype + " "
+        fieldStr += self.declaretype + " "
         fieldStr += self.name
-        if ("spare" in self.name):
+        if (self.fieldtype == "spare"):
             fieldStr += " = " + str(self.length)
-        return fieldStr + ";"
+        return fieldStr + ";\n"
+
+    def getGetBytesString(self):
+        lineDict = {
+            "integer": ["bb.putInt(", ");\n"],
+            "short": ["bb.putShort(", ");\n"],
+            "float": ["bb.putFloat(", ");\n"],
+            "uinteger": ["bb.putInt(", ");\n"],
+            "ushort": ["bb.putShort((new Integer(", ")).shortValue();\n"],
+            "spare": ["bb.put(new byte[]{", "});\n"],
+            "String": ["//DO SOMETHING ", " FOR STRINGS\n"],
+            "byte": ["bb.put(", "});\n"],
+        }
+
+        retVal = ((self.indentLevel + 1) * "    ") + lineDict[self.fieldtype][0]
+        if (self.fieldtype == "spare"):
+            retVal += (("(byte) 0," * self.length)[:-1])
+        else:
+            retVal += self.name
+        return retVal + lineDict[self.fieldtype][1]
+
 
     @staticmethod
     def getValidName(name, datatype):
         retVal = ""
         if (datatype == "spare"):
             retVal = "spare"
+        elif (datatype == "uinteger"):
+            retVal = "u_" + name
+        elif (datatype == "ushort"):
+            retVal = "us_" + name
         else:
             retVal = name
         
