@@ -267,6 +267,8 @@ def main():
     for c in data["Classes"]:
         if (c["type"]=="Class"):
             jc = JavaClass(c["name"], c["value"], 0)
-            print(jc.toString())
+            newFile = open(currDir + "/" + jc.name + ".java", "w")
+            newFile.write(jc.toString())
+            newFile.close()
             
 main()
