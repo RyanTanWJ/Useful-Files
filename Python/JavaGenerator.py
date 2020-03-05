@@ -1,6 +1,7 @@
 import json
 import os
 
+javaImports = {"java.nio.ByteBuffer","java.nio.charset.StandardCharsets"}
 varNames = {}
 
 ##Python 2 Class definition
@@ -29,6 +30,12 @@ class JavaClass:
 
     def toString(self):
         classStr = self.getHeader()
+        
+        if (self.indentLevel==0):
+            importLines = ""
+            for i in javaImports:
+                importLines += "import " + i + ";\n"
+            classStr = importLines + "\n" + classStr
 
         classStr += self.getLengthLine()
         
@@ -111,7 +118,7 @@ class Field:
             "uinteger": ["bb.putInt(", ");\n"],
             "ushort": ["bb.putShort((new Integer(", ")).shortValue();\n"],
             "spare": ["bb.put(new byte[]{", "});\n"],
-            "String": ["//DO SOMETHING ", " FOR STRINGS\n"],
+            "String": ["bb.put(StandardCharsets.US_ASCII.encode(", ").array();\n"],
             "byte": ["bb.put(", "});\n"],
         }
 
@@ -122,6 +129,9 @@ class Field:
             retVal += self.name
         return retVal + lineDict[self.fieldtype][1]
 
+    def getSetBytesString(self):
+        retVal = ((self.indentLevel + 1) * "    ")
+        return retVal
 
     @staticmethod
     def getValidName(name, datatype):
