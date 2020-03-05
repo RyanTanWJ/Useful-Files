@@ -42,10 +42,12 @@ class JavaClass:
         fieldDeclarations = ""
         getMethodFields = ""
         setMethodFields = ""
+        getStringFields = ""
         for field in self.fields:
             fieldDeclarations += field.getDeclarationString()
             getMethodFields += field.getGetBytesString()
             setMethodFields += field.getSetBytesString()
+            getStringFields += field.getGetStringString()
 
         classStr += fieldDeclarations
         
@@ -55,6 +57,7 @@ class JavaClass:
 
         classStr += self.getSetBytesLine(setMethodFields) + "\n"
 
+        classStr += self.getGetStringLine(getStringFields)
         
         classStr += (self.indentLevel * "    ") + "}"
         return classStr
@@ -77,7 +80,7 @@ class JavaClass:
 
     def getGetBytesLine(self, fields):
         retVal = ((self.indentLevel + 1) * "    ")
-        retVal += "public getBytes(ByteBuffer bb) {\n"
+        retVal += "public void getBytes(ByteBuffer bb) {\n"
         retVal += fields
         retVal += ((self.indentLevel + 1) * "    ")
         retVal += "}\n"
@@ -85,7 +88,7 @@ class JavaClass:
     
     def getSetBytesLine(self, fields):
         retVal = ((self.indentLevel + 1) * "    ")
-        retVal += "public setBytes(ByteBuffer bb) {\n"
+        retVal += "public void setBytes(ByteBuffer bb) {\n"
         retVal += ((self.indentLevel + 2) * "    ")
         retVal += "int idx = 0;\n"
         retVal += ((self.indentLevel + 2) * "    ")
@@ -94,7 +97,21 @@ class JavaClass:
         retVal += ((self.indentLevel + 1) * "    ")
         retVal += "}\n"
         return retVal
-        
+
+    def getGetStringLine(self, fields):
+        retVal = ((self.indentLevel + 1) * "    ")
+        retVal += "@Override\n"
+        retVal += ((self.indentLevel + 1) * "    ")
+        retVal += "public String getString() {\n"
+        retVal += ((self.indentLevel + 2) * "    ")
+        retVal += "StringBuilder sb = new StringBuilder();\n"
+        retVal += fields
+        retVal += ((self.indentLevel + 2) * "    ")
+        retVal += "return sb.toString();\n"
+        retVal += ((self.indentLevel + 1) * "    ")
+        retVal += "}\n"
+        return retVal
+
 ##Python 2 Class definition
 ##class Field(object):
 class Field:
@@ -133,9 +150,9 @@ class Field:
             "short": ["bb.putShort(", ");\n"],
             "float": ["bb.putFloat(", ");\n"],
             "uinteger": ["bb.putInt(", ");\n"],
-            "ushort": ["bb.putShort((new Integer(", ")).shortValue();\n"],
+            "ushort": ["bb.putShort((new Integer(", ")).shortValue());\n"],
             "spare": ["bb.put(new byte[]{", "});\n"],
-            "String": ["bb.put(StandardCharsets.US_ASCII.encode(", ").array();\n"],
+            "String": ["bb.put(StandardCharsets.US_ASCII.encode(", ").array());\n"],
             "byte": ["bb.put(", ");\n"],
         }
 
@@ -153,7 +170,7 @@ class Field:
             "short": ["bb.getShort(", "idx);\n", "2"],
             "float": ["bb.getFloat(", "idx);\n", "4"],
             "uinteger": ["bb.getInt(", "idx);\n", "4"],
-            "byte": ["bb.get(", "idx});\n", "1"],
+            "byte": ["bb.get(", "idx);\n", "1"]
         }
 
         if (self.fieldtype == "spare"):
@@ -168,7 +185,7 @@ class Field:
                      "bb.get(tempByteArr, idx, idx + " + str(self.length) + ");\n"
             retVal += ((self.indentLevel + 1) * "    ") + self.name +\
                       " = new String(tempByteArr, StandardCharsets.US_ASCII);\n"
-            retVal += ((self.indentLevel + 1) * "    ") + "i += " + str(self.length) + ";\n\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "idx += " + str(self.length) + ";\n\n"
             return retVal
         elif (self.fieldtype == "ushort"):
             retVal = ((self.indentLevel + 1) * "    ") + "tempByteArr = new byte[4];\n"
@@ -176,7 +193,7 @@ class Field:
             retVal += ((self.indentLevel + 1) * "    ") + "tempByteArr[3] = bb.get(idx+1);\n"
             retVal += ((self.indentLevel + 1) * "    ") + self.name +\
                       " = ByteBuffer.wrap(tempByteArr).getInt();\n"
-            retVal += ((self.indentLevel + 1) * "    ") + "i += 2;\n\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "idx += 2;\n\n"
             return retVal
         
         retVal = ((self.indentLevel + 1) * "    ") + self.name
@@ -184,6 +201,26 @@ class Field:
         retVal += lineDict[self.fieldtype][1]
         retVal += ((self.indentLevel + 1) * "    ")
         retVal += "idx += " + lineDict[self.fieldtype][2] + ";\n\n"
+        return retVal
+
+    def getGetStringString(self):
+        # Spares, Strings and Unsigned Shorts are too unique
+        lineDict = {
+            "integer": ['String.format("', ': %d\\n", ', '));\n'],
+            "short": ['String.format("', ': %d\\n", ', '));\n'],
+            "float": ['String.format("', ': %d\\n", ', '));\n'],
+            "uinteger": ['String.format("', ': %s\\n", Integer.toUnsignedString(', ')));\n'],
+            "ushort": ['String.format("', ': %d\\n", ', '));\n'],
+            "String":  ['String.format("', ': %s\\n", ', '));\n'],
+            "byte":  ['String.format("', ': %d\\n", ', '));\n'],
+        }
+
+        retVal = ((self.indentLevel + 1) * "    ") + 'sb.append('
+        if (self.fieldtype == "spare"):
+            return  retVal + '"' + self.name + '\\n");\n'
+        retVal += lineDict["integer"][0] + self.name
+        retVal += lineDict["integer"][1] + self.name
+        retVal += lineDict["integer"][2]
         return retVal
 
     @staticmethod
