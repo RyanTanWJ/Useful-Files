@@ -41,15 +41,20 @@ class JavaClass:
         
         fieldDeclarations = ""
         getMethodFields = ""
+        setMethodFields = ""
         for field in self.fields:
             fieldDeclarations += field.getDeclarationString()
             getMethodFields += field.getGetBytesString()
+            setMethodFields += field.getSetBytesString()
 
         classStr += fieldDeclarations
         
         classStr += "\n" + self.getConstructor()
 
-        classStr += self.getGetBytesLine(getMethodFields)
+        classStr += self.getGetBytesLine(getMethodFields) + "\n"
+
+        classStr += self.getSetBytesLine(setMethodFields) + "\n"
+
         
         classStr += (self.indentLevel * "    ") + "}"
         return classStr
@@ -73,6 +78,18 @@ class JavaClass:
     def getGetBytesLine(self, fields):
         retVal = ((self.indentLevel + 1) * "    ")
         retVal += "public getBytes(ByteBuffer bb) {\n"
+        retVal += fields
+        retVal += ((self.indentLevel + 1) * "    ")
+        retVal += "}\n"
+        return retVal
+    
+    def getSetBytesLine(self, fields):
+        retVal = ((self.indentLevel + 1) * "    ")
+        retVal += "public setBytes(ByteBuffer bb) {\n"
+        retVal += ((self.indentLevel + 2) * "    ")
+        retVal += "int idx = 0;\n"
+        retVal += ((self.indentLevel + 2) * "    ")
+        retVal += "byte[] tempByteArr;\n\n"
         retVal += fields
         retVal += ((self.indentLevel + 1) * "    ")
         retVal += "}\n"
@@ -119,7 +136,7 @@ class Field:
             "ushort": ["bb.putShort((new Integer(", ")).shortValue();\n"],
             "spare": ["bb.put(new byte[]{", "});\n"],
             "String": ["bb.put(StandardCharsets.US_ASCII.encode(", ").array();\n"],
-            "byte": ["bb.put(", "});\n"],
+            "byte": ["bb.put(", ");\n"],
         }
 
         retVal = ((self.indentLevel + 1) * "    ") + lineDict[self.fieldtype][0]
@@ -130,7 +147,43 @@ class Field:
         return retVal + lineDict[self.fieldtype][1]
 
     def getSetBytesString(self):
-        retVal = ((self.indentLevel + 1) * "    ")
+        # Spares, Strings and Unsigned Shorts are too unique
+        lineDict = {
+            "integer": ["bb.getInt(", "idx);\n", "4"],
+            "short": ["bb.getShort(", "idx);\n", "2"],
+            "float": ["bb.getFloat(", "idx);\n", "4"],
+            "uinteger": ["bb.getInt(", "idx);\n", "4"],
+            "byte": ["bb.get(", "idx});\n", "1"],
+        }
+
+        if (self.fieldtype == "spare"):
+            retVal = ((self.indentLevel + 1) * "    ") + "//" + self.name
+            retVal += "\n" + ((self.indentLevel + 1) * "    ") + "idx += " +\
+                      str(self.length) + ";\n\n"
+            return retVal
+        elif (self.fieldtype == "String"):
+            retVal = ((self.indentLevel + 1) * "    ") +\
+                     "tempByteArr = new byte[" + str(self.length) + "];\n"
+            retVal += ((self.indentLevel + 1) * "    ") +\
+                     "bb.get(tempByteArr, idx, idx + " + str(self.length) + ");\n"
+            retVal += ((self.indentLevel + 1) * "    ") + self.name +\
+                      " = new String(tempByteArr, StandardCharsets.US_ASCII);\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "i += " + str(self.length) + ";\n\n"
+            return retVal
+        elif (self.fieldtype == "ushort"):
+            retVal = ((self.indentLevel + 1) * "    ") + "tempByteArr = new byte[4];\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "tempByteArr[2] = bb.get(idx);\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "tempByteArr[3] = bb.get(idx+1);\n"
+            retVal += ((self.indentLevel + 1) * "    ") + self.name +\
+                      " = ByteBuffer.wrap(tempByteArr).getInt();\n"
+            retVal += ((self.indentLevel + 1) * "    ") + "i += 2;\n\n"
+            return retVal
+        
+        retVal = ((self.indentLevel + 1) * "    ") + self.name
+        retVal += " = " + lineDict[self.fieldtype][0]
+        retVal += lineDict[self.fieldtype][1]
+        retVal += ((self.indentLevel + 1) * "    ")
+        retVal += "idx += " + lineDict[self.fieldtype][2] + ";\n\n"
         return retVal
 
     @staticmethod
