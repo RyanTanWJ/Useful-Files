@@ -1,3 +1,12 @@
+# Build a Docker image from a Dockerfile
+With a ***CLI in the directory containing your dockerfile***, use the following command:
+
+    docker build . -t <image-name>
+    
+# Instantly create a new container with an image as a base and opens a bash terminal (For LINUX)
+
+    docker run -ti <image-name> /bin/bash
+    
 # Listing Images and Containers
 Images are a saved state of an Operating System (OS) at a certain time. Images are read-only and **cannot** be run. Containers use an image as a base. As containers virtualise the running of an OS, a new Image can be created from a container.
 
