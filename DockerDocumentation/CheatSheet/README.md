@@ -18,6 +18,12 @@ Use the following command. You can exclude the ```-a``` option to view only runn
 
     docker ps -a
 
+###### Sample output:
+
+    CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                         PORTS               NAMES
+    b171a61e0028        a-container         "/bin/sh -c ./bin/ba…"   3 minutes ago       Exited (0) 9 minutes ago                           ecstatic_chatterjee
+    dd55ea5bc7b5        tagged-container    "/bin/sh -c ./bin/ba…"   About an hour ago   Created                                            elated_wilbur
+
 # Save an image to a tar archive and load it again on a different computer
 ## Save an image to a tar archive
 Use the following command to save a docker image as a tar file on your machine
