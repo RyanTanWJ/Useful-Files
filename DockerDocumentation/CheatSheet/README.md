@@ -3,10 +3,12 @@ With a ***CLI in the directory containing your dockerfile***, use the following 
 
     docker build . -t <image-name>
     
-# Instantly create a new container with an image as a base and opens a bash terminal (For LINUX)
+# Quick-Start: Create a new container with an image as a base and opens a bash terminal (LINUX-SPECIFIC)
 
     docker run -ti <image-name> /bin/bash
     
+```/bin/bash``` opens bash terminal for you to access the virtualised OS. ```-ti``` makes it possible to enter commands and for user interaction.
+
 # Listing Images and Containers
 Images are a saved state of an Operating System (OS) at a certain time. Images are read-only and **cannot** be run. Containers use an image as a base. As containers virtualise the running of an OS, a new Image can be created from a container.
 
