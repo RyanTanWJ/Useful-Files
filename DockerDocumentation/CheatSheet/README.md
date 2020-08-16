@@ -1,4 +1,7 @@
-# List all containers and their image IDs
+# Listing Images and Containers
+Images are a saved state of an Operating System (OS) at a certain time. Images are read-only and **cannot** be run. Containers use an image as a base. As containers virtualise the running of an OS, a new Image can be created from a container.
+
+## List all Images
 Use the following command.
 
     docker images
@@ -9,6 +12,11 @@ Use the following command.
     a-container                 latest              2d12799ae068        2 days ago          10.4MB
     docker/docker101tutorial    latest              5c257ac7fd00        4 months ago        72.8MB
     tagged-container            latest              5c257ac7fd00        4 months ago        72.8MB
+
+## List all Containers
+Use the following command. You can exclude the ```-a``` option to view only running containers.
+
+    docker ps -a
 
 # Save an image to a tar archive and load it again on a different computer
 ## Save an image to a tar archive
