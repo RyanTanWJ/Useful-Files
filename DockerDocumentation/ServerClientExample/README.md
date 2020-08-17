@@ -12,8 +12,8 @@ This guide assumes you already have the following:
     3. A UserClient build that can be used for visualising the server side state
 
 ## Overview of the process
-1. [Build your Unity Server, ServiceClient and UserClient Applications](#build-your-unity-server,-serviceClient-and-userclient-applications)
-2. [Set up your dockerfile](## Set up your dockerfile)
+1. [Build your Unity Server, ServiceClient and UserClient Applications](#build-your-unity-server-serviceclient-and-userclient-applications)
+2. [Set up your dockerfile](#set-up-your-dockerfile)
 3. [Configure your ```docker-compose.yml``` file](#configure-your-docker-compose.yml-file)
 4. [Run in Windows Powershell](#run-in-windows-powershell)
 
@@ -27,7 +27,7 @@ My Server and ServiceClients will be running in containers with the ```ubi8``` O
 3. ***Enable*** **Server Build** or **Headless Mode** (depends on Unity editor version)
 4. Click the "Build" button and select a directory to save it in
 
-[**Reminder** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](###### When following this guide, please ensure that your dockerfile and docker-compose.yml files are in the same directory as your Unity build.) 
+[**Reminder** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](#when-following-this-guide-please-ensure-that-your-dockerfile-and-docker-composeyml-files-are-in-the-same-directory-as-your-unity-build) 
 
 #### To build the UserClient Application
 1. In the Unity Editor, go to:
