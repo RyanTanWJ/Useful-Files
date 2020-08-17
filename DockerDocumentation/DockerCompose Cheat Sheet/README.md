@@ -31,4 +31,4 @@ Use this to specify the name of the container created when running ```docker-com
         image: <image-name>
         container-name: <container-name>
         
-The container will then be named, ``<container-name>```, istead of ```<cwd>_<service-name>_1```
+The container will then be named, ```<container-name>```, istead of ```<cwd>_<service-name>_1```
