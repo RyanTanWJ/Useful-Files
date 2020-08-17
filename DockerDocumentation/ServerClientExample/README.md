@@ -1,5 +1,3 @@
-Make sure it work offline in dev laptop.
-
 # How to use Docker to divide the load on a Unity server
 This guide aims to outline how you can use docker to provide aspects of your game as microservices so as to offload the work done in each frame to different containers.
 
@@ -77,17 +75,3 @@ Here you will specify a set of instructions to start a UserClient on your physic
 The last step is simply to execute the command for everything to work in Windows Powershell.
 
     docker-compose up
-
-treat it like a beginner guide for some one to get to work with our unity proj and docker right away.
-
-i.e 
-step 1. setup dockerfile in this manner.... with following settings....
-
-step 2. setup compose.yml .... write cli params here..... update port number here...
-
-
-i imagine my example setup would be: 
-- 1 dockerfile for unity build
-- 1 compose.yml describing-
-   + 1 master sever with req cli params
-   + 1 or 2 client with req cli params
