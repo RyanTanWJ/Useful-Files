@@ -12,7 +12,7 @@ This guide assumes you already have the following:
     3. A UserClient build that can be used for visualising the server side state
 
 ## Overview of the process
-1. [Build your Unity Server, ServiceClient and UserClient Applications](##Build-your-Unity-Server,-ServiceClient-and-UserClient-Applications)
+1. [Build your Unity Server, ServiceClient and UserClient Applications](##build-your-unity-server,-serviceClient-and-userclient-applications)
 2. [Set up your dockerfile](## Set up your dockerfile)
 3. [Configure your ```docker-compose.yml``` file](## Configure your docker-compose.yml file)
 4. [Run in Windows Powershell](## Run in Windows Powershell)
