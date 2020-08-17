@@ -15,7 +15,7 @@ This guide assumes you already have the following:
 1. [Build your Unity Server, ServiceClient and UserClient Applications](##build-your-unity-server,-serviceClient-and-userclient-applications)
 2. [Set up your dockerfile](## Set up your dockerfile)
 3. [Configure your ```docker-compose.yml``` file](## Configure your docker-compose.yml file)
-4. [Run in Windows Powershell](## Run in Windows Powershell)
+4. [Run in Windows Powershell](##run-in-windows-powershell)
 
 ## Build your Unity Server, ServiceClient and UserClient Applications
 My Server and ServiceClients will be running in containers with the ```ubi8``` Operating System. I am using Docker on a ```Windows``` system, so my UserClient will be running on my ```Windows``` physical machine.
