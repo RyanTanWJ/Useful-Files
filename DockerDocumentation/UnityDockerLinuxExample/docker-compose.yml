@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+    unity_server:
+        build: .
+        image: test_ubi8_unity
+        container_name: test-ubi8-unity
