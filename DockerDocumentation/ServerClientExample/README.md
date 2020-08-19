@@ -69,7 +69,40 @@ Within the ```dockerfile```, add the following lines:
     COPY <unity-app-name>_Data.x86_64 ./root/<unity-app-name>_Data
 
 ## Configure your docker-compose.yml file
-Here you will specify a set of instructions to start a UserClient on your physical machine, run containers with the ServiceClient with specific settings.
+Here you will specify a set of instructions to start a UserClient on your physical machine, run containers with the ServiceClient with specific settings. Provided below is an example of a ```docker-compose.yml``` file, followed by the explanations for how to use the keys.
+
+    version: "3.8"
+
+    services:
+        unity_server:
+            build:
+                context: .
+                dockerfile: ./DockerfileHere/Dockerfile
+            image: ubi8_unity_img
+            container_name: ubi8-unity-container
+            entrypoint: ./root/headless-test.x86_64 -of 41
+
+```version:``` specifies the ```docker-compose``` [file reference version](https://docs.docker.com/compose/compose-file/).
+
+You can specify all the different services to provide under ```services:```. Do not let the name scare you. The defined services, such as ```unity_server``` are little more than names. Within each service you can configure how your service is built. Each of the defined services will create a new image.
+
+```build:``` specifies the build context, where the instructions in your dockerfile take place. Without ```build```, docker will try to pull the image instead.
+
+If you do not need to specify other options, ```context``` is not necessary. You can simple use:
+
+```build: .```
+
+You can use ```dockerfile:``` to specify a different dockerfile or even one that is not in your build context.
+
+```image:```specifies the name of the image that docker. You can also give it a tag by adding ```:<tag>``` to the end. E.g. ```image: ubi8_unity_img: mytag```
+
+After the image is built, docker will automatically create a container to run the new service images you've specified.
+
+```container-name:``` can be used to set the container's name rather than using one of docker's randomly generated default names.
+
+Lastly, ```entrypoint:``` can be used to define the ```ENTRYPOINT``` for docker and will override the ```ENTRYPOINT``` in the ```dockerfile``` if it exists. You can also add on any additional command line parameters, ```-a, v, --help```, that will be processed by the Unity application in the container.
+
+**NOTE:** If you have already built an image once before, you may notice that your images are not being built again after making changes to your ```docker-compose.yml```. In order to rebuild these images you can either remove the images and their associated containers, or you can run ```docker-compose up --build```
 
 ## Run in Windows Powershell
 The last step is simply to execute the command for everything to work in Windows Powershell.
