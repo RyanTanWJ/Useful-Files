@@ -4,7 +4,7 @@ This guide aims to outline how you can use docker to provide aspects of your gam
 ## Overview of the process
 1. Build your Unity Server, ServiceClient and UserClient Applications
 2. [Set up your dockerfile](#set-up-your-dockerfile)
-3. [Configure your ```docker-compose.yml``` file](#configure-your-docker-compose.yml-file)
+3. [Configure your ```docker-compose.yml``` file](#configure-your-docker-compose-file)
 4. [Run in Windows Powershell](#run-in-windows-powershell)
 
 ## Set up your dockerfile
@@ -20,7 +20,7 @@ Use a text editor to populate it with:
     COPY <unity-app-name>.x86_64 ./root
     COPY <unity-app-name>_Data.x86_64 ./root/<unity-app-name>_Data
 
-## Configure your docker-compose.yml file
+## Configure your docker-compose file
 Create a ```docker-compose.yml``` file, populate it with the following:
 
     version: "3.8"

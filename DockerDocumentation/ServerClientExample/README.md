@@ -14,7 +14,7 @@ This guide assumes you already have the following:
 ## Overview of the process
 1. [Build your Unity Server, ServiceClient and UserClient Applications](#build-your-unity-server-serviceclient-and-userclient-applications)
 2. [Set up your dockerfile](#set-up-your-dockerfile)
-3. [Configure your ```docker-compose.yml``` file](#configure-your-docker-compose.yml-file)
+3. [Configure your ```docker-compose``` file](#configure-your-docker-compose-file)
 4. [Run in Windows Powershell](#run-in-windows-powershell)
 
 ## Build your Unity Server, ServiceClient and UserClient Applications
@@ -68,7 +68,7 @@ Within the ```dockerfile```, add the following lines:
     COPY <unity-app-name>.x86_64 ./root
     COPY <unity-app-name>_Data.x86_64 ./root/<unity-app-name>_Data
 
-## Configure your docker-compose.yml file
+## Configure your docker-compose file
 Here you will specify a set of instructions to start a UserClient on your physical machine, run containers with the ServiceClient with specific settings. Provided below is an example of a ```docker-compose.yml``` file, followed by the explanations for how to use the keys.
 
     version: "3.8"
