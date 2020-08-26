@@ -40,4 +40,4 @@ The last step is simply to execute the command for everything to work in Windows
     docker-compose up
 
 ## Problems?
-Read the full documentation.
+Read the [full documentation](https://github.com/RyanTanWJ/Useful-Files/tree/master/DockerDocumentation/ServerClientExample).
