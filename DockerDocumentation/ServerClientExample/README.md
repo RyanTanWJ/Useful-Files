@@ -27,7 +27,7 @@ My Server and ServiceClients will be running in containers with the ```ubi8``` O
 3. ***Enable*** **Server Build** or **Headless Mode** (depends on Unity editor version)
 4. Click the "Build" button and select a directory to save it in
 
-[**Reminder** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](#when-following-this-guide-please-ensure-that-your-dockerfile-and-docker-composeyml-files-are-in-the-same-directory-as-your-unity-build) 
+[**Reminder:** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](#when-following-this-guide-please-ensure-that-your-dockerfile-and-docker-composeyml-files-are-in-the-same-directory-as-your-unity-build) 
 
 #### To build the UserClient Application
 1. In the Unity Editor, go to:
@@ -41,6 +41,8 @@ Here you will set up a dockerfile to build you Unity application.
 
 ### Create a dockerfile
 Create a new file, and call it ```dockerfile```. It should not have any extension.
+
+[**Reminder:** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](#when-following-this-guide-please-ensure-that-your-dockerfile-and-docker-composeyml-files-are-in-the-same-directory-as-your-unity-build) 
 
 Your ```dockerfile``` should begin with:
 
@@ -71,6 +73,8 @@ Within the ```dockerfile```, add the following lines:
 ## Configure your docker-compose file
 Here you will specify a set of instructions to start a UserClient on your physical machine, run containers with the ServiceClient with specific settings. Provided below is an example of a ```docker-compose.yml``` file, followed by the explanations for how to use the keys.
 
+[**Reminder:** Your ```dockerfile``` and ```docker-compose.yml``` should be located in the same directory where you build this](#when-following-this-guide-please-ensure-that-your-dockerfile-and-docker-composeyml-files-are-in-the-same-directory-as-your-unity-build) 
+
     version: "3.8"
 
     services:
@@ -100,7 +104,7 @@ After the image is built, docker will automatically create a container to run th
 
 ```container-name:``` can be used to set the container's name rather than using one of docker's randomly generated default names.
 
-Lastly, ```entrypoint:``` can be used to define the ```ENTRYPOINT``` for docker and will override the ```ENTRYPOINT``` in the ```dockerfile``` if it exists. You can also add on any additional command line parameters, ```-a, v, --help```, that will be processed by the Unity application in the container.
+Lastly, ```entrypoint:``` can be used to define the ```ENTRYPOINT``` for docker and will override the ```ENTRYPOINT``` in the ```dockerfile``` if it exists. You can also add on any additional command line parameters, ```-a```, ```v```, ```--help```, that will be processed by the Unity application in the container.
 
 **NOTE:** If you have already built an image once before, you may notice that your images are not being built again after making changes to your ```docker-compose.yml```. In order to rebuild these images you can either remove the images and their associated containers, or you can run ```docker-compose up --build```
 
