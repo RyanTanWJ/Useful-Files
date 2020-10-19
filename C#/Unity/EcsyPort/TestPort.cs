@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using RyanPort;
+using EcsyPort;
 
 namespace TestPort
 {
-    public class MovementSystem : RyanPort.System
+    public class MovementSystem : EcsyPort.System
     {
         protected override bool componentCheck(Entity entity)
         {
@@ -21,7 +21,7 @@ namespace TestPort
             }
         }
     }
-    public class RotationSystem : RyanPort.System
+    public class RotationSystem : EcsyPort.System
     {
         protected override bool componentCheck(Entity entity)
         {
@@ -39,7 +39,7 @@ namespace TestPort
         }
     }
 
-    public class CubeEntity : RyanPort.Entity
+    public class CubeEntity : EcsyPort.Entity
     {
         public CubeEntity(){
             components = new Dictionary<Type, Component>();
@@ -56,7 +56,7 @@ namespace TestPort
         }
     }
 
-    public class PositionComponent : RyanPort.Component
+    public class PositionComponent : EcsyPort.Component
     {
         public float x;
         public float y;
@@ -70,7 +70,7 @@ namespace TestPort
         }
     }
 
-    public class RotationComponent : RyanPort.Component
+    public class RotationComponent : EcsyPort.Component
     {
         public float x;
         public float y;

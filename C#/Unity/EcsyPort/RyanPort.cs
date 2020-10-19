@@ -1,88 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace RyanPort
+namespace EcsyPort
 {
-    public class World
-    {
-        private ComponentManager componentManager;
-        private EntityManager entityManager;
-        private SystemManager systemManager;
-
-        public World()
-        {
-            componentManager = new ComponentManager();
-            entityManager = new EntityManager();
-            systemManager = new SystemManager();
-        }
-
-        public void registerComponent(Component component)
-        {
-            componentManager.registerComponent(component);
-        }
-
-        public bool hasRegisteredComponent(Component component)
-        {
-            return componentManager.hasComponent(component);
-        }
-
-        public void registerSystem(System system)
-        {
-            systemManager.registerSystem(system);
-        }
-
-        public void unregisterSystem(System system)
-        {
-            systemManager.unregisterSystem(system);
-        }
-
-        public System getSystem(Type systemType)
-        {
-            return systemManager.getSystem(systemType);
-        }
-
-        public Dictionary<Type, System> getSystems()
-        {
-            return systemManager.getSystems();
-        }
-
-        public void registerEntity(Entity entity)
-        {
-            entityManager.registerEntity(entity);
-        }
-
-        public void unregisterEntity(Entity entity)
-        {
-            entityManager.unregisterEntity(entity);
-        }
-
-        public Entity getEntity(Type entityType, int id){
-            return entityManager.getEntity(entityType, id);
-        }
-
-        public void execute(float deltaTime)
-        {
-            Dictionary<Type, System> systems = systemManager.getSystems();
-            Dictionary<Type, List<Entity>> entities = entityManager.getEntities();
-            foreach (Type systemKey in systems.Keys)
-            {
-                foreach (Type entityKey in entities.Keys)
-                {
-                    foreach (Entity entity in entities[entityKey])
-                    {
-                        systems[systemKey].execute(deltaTime, entity);
-                    }
-                }
-            }
-        }
-
-        public string stats()
-        {
-            return string.Format("Stats:{\n{0},\n{1}\n}", entityManager.stats(), systemManager.stats());
-        }
-    }
-
     public class ComponentManager
     {
         private Dictionary<Type, List<Component>> _components;
@@ -124,39 +46,59 @@ namespace RyanPort
 
     public class EntityManager
     {
-        private Dictionary<Type, List<Entity>> _entities;
+        private Dictionary<Type, EntityPool<Entity>> _entities;
 
         public EntityManager()
         {
-            _entities = new Dictionary<Type, List<Entity>>();
+            _entities = new Dictionary<Type, EntityPool<Entity>>();
         }
 
-        public void registerEntity(Entity entity)
+        public void registerEntity<T>(T entity) where T : Entity
         {
-            Type entityType = entity.GetType();
+            Type entityType = typeof(T);
             if (!_entities.ContainsKey(entityType))
             {
-                _entities.Add(entityType, new List<Entity>());
+                // TODO: Figure out how to create Entity Pool of type T instead
+                _entities.Add(entityType, new EntityPool<Entity>());
             }
-            _entities[entityType].Add(entity);
+            _entities[entityType].newEntity(entity);
         }
 
-        public void unregisterEntity(Entity entity)
+        public void unregisterEntity<T>(T entity) where T : Entity
         {
-            Type entityType = entity.GetType();
+            Type entityType = typeof(T);
             if (_entities.ContainsKey(entityType))
             {
-                _entities[entityType].Remove(entity);
+                _entities[entityType].removeEntity(entity);
+            }
+        }
+
+        public void unregisterEntity<T>(int entityId) where T : Entity
+        {
+            Type entityType = typeof(T);
+            if (_entities.ContainsKey(entityType))
+            {
+                _entities[entityType].removeEntity(entityId);
             }
         }
 
         // TODO: Wrong use of entityId, find the id in the list of entities and return that entity
         public Entity getEntity(Type entityType, int entityId)
         {
-            return _entities[entityType][entityId];
+            return _entities[entityType].getEntity(entityId);
         }
 
-        public Dictionary<Type, List<Entity>> getEntities()
+        public T getEntity<T>(int entityId) where T : Entity
+        {
+            bool inPool = _entities.ContainsKey(typeof(T));
+            if (!inPool)
+            {
+                return null;
+            }
+            return (T) (_entities[typeof(T)].getEntity(entityId));
+        }
+
+        public Dictionary<Type, EntityPool<Entity>> getEntities()
         {
             return _entities;
         }
@@ -164,6 +106,73 @@ namespace RyanPort
         public string stats()
         {
             return "";
+        }
+    }
+
+    public class EntityPool<T> where T : Entity
+    {
+        private int entityCount;
+
+        private Dictionary<int, T> entitiesInUse;
+        private Dictionary<int, T> reserved;
+
+        public EntityPool()
+        {
+            entityCount = 0;
+            entitiesInUse = new Dictionary<int, T>();
+            reserved = new Dictionary<int, T>();
+        }
+
+        public T newEntity(T entity)
+        {
+            bool inUse = entitiesInUse.ContainsValue(entity);
+            bool inReserve = reserved.ContainsValue(entity);
+            if (inUse || inReserve)
+            {
+                return entity;
+            }
+            entity.ID = entityCount;
+            entityCount++;
+            return entity;
+        }
+
+        public T getEntity(int entityId)
+        {
+            return entitiesInUse[entityId];
+        }
+
+        public void removeEntity(T entity)
+        {
+            if (!entitiesInUse.ContainsKey(entity.ID))
+            {
+                return;
+            }
+            entitiesInUse.Remove(entity.ID);
+            reserved.Add(entity.ID, entity);
+        }
+
+        public void removeEntity(int entityId)
+        {
+            if (!entitiesInUse.ContainsKey(entityId))
+            {
+                return;
+            }
+            T entity = entitiesInUse[entityId];
+            entitiesInUse.Remove(entityId);
+            reserved.Add(entity.ID, entity);
+        }
+
+        public List<T> getActiveEntities()
+        {
+            return entitiesInUse.Values.ToList<T>();
+        }
+
+        public List<T> getAllEntities()
+        {
+            var inUse = entitiesInUse.Values.ToList<T>();
+            var res = reserved.Values.ToList<T>();
+            inUse.AddRange(res);
+            return inUse;
         }
     }
 
@@ -226,44 +235,5 @@ namespace RyanPort
         {
             return "";
         }
-    }
-
-    public abstract class Component
-    {
-        public int id;
-    }
-
-    public abstract class Entity
-    {
-        public int id;
-
-        protected Dictionary<Type, Component> components;
-
-        public bool hasComponent(Type componentType)
-        {
-            return components.ContainsKey(componentType);
-        }
-
-        public bool hasComponents(params Type[] componentTypes)
-        {
-            foreach (Type componentType in componentTypes)
-            {
-                if (!components.ContainsKey(componentType))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public Component getComponent(Type componentType){
-            return components[componentType];
-        }
-    }
-
-    public abstract class System
-    {
-        protected abstract bool componentCheck(Entity entity);
-        public abstract void execute(float deltaTime, Entity entity);
     }
 }

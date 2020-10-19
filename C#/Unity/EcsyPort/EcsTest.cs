@@ -6,11 +6,11 @@ public class EcsTest : MonoBehaviour
 {
     [SerializeField]
     private GameObject testCube;
-    RyanPort.World world;
+    EcsyPort.World world;
     
     void Start()
     {
-        world = new RyanPort.World();
+        world = new EcsyPort.World();
         world.registerSystem(new TestPort.MovementSystem());
         world.registerSystem(new TestPort.RotationSystem());
         world.registerEntity(new TestPort.CubeEntity());
