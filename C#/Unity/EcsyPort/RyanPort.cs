@@ -64,6 +64,17 @@ namespace EcsyPort
             _entities[entityType].newEntity(entity);
         }
 
+        public void requestEntity<T>(T entity) where T : Entity, new()
+        {
+            Type entityType = typeof(T);
+            if (!_entities.ContainsKey(entityType))
+            {
+                // TODO: Figure out how to create Entity Pool of type T instead
+                _entities.Add(entityType, new EntityPool<Entity>());
+            }
+            _entities[entityType].newEntity(entity);
+        }
+
         public void unregisterEntity<T>(T entity) where T : Entity
         {
             Type entityType = typeof(T);
@@ -109,7 +120,7 @@ namespace EcsyPort
         }
     }
 
-    public class EntityPool<T> where T : Entity
+    public class EntityPool<T> where T : Entity, new()
     {
         private int entityCount;
 
@@ -121,6 +132,22 @@ namespace EcsyPort
             entityCount = 0;
             entitiesInUse = new Dictionary<int, T>();
             reserved = new Dictionary<int, T>();
+        }
+
+        public T newEntity()
+        {
+            bool inReserve = reserved.Count > 0;
+            if (inReserve)
+            {
+                int key = reserved.Keys.First();
+                T e = reserved[key];
+                entitiesInUse.Add(key, e);
+                return e;
+            }
+            var newEntity = new T();
+            newEntity.ID = entityCount;
+            entityCount++;
+            return newEntity;
         }
 
         public T newEntity(T entity)

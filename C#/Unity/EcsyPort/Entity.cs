@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EcsyPort
 {
-    public abstract class Entity
+    public class Entity
     {
         private int id;
 
