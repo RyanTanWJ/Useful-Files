@@ -46,33 +46,21 @@ namespace EcsyPort
 
     public class EntityManager
     {
-        private Dictionary<Type, EntityPool<Entity>> _entities;
+        private Dictionary<Type, EntityPool> _entities;
 
         public EntityManager()
         {
-            _entities = new Dictionary<Type, EntityPool<Entity>>();
+            _entities = new Dictionary<Type, EntityPool>();
         }
 
-        public void registerEntity<T>(T entity) where T : Entity
+        public void requestEntity<T>() where T : Entity, new()
         {
             Type entityType = typeof(T);
             if (!_entities.ContainsKey(entityType))
             {
-                // TODO: Figure out how to create Entity Pool of type T instead
-                _entities.Add(entityType, new EntityPool<Entity>());
+                _entities.Add(entityType, new EntityPool());
             }
-            _entities[entityType].newEntity(entity);
-        }
-
-        public void requestEntity<T>(T entity) where T : Entity, new()
-        {
-            Type entityType = typeof(T);
-            if (!_entities.ContainsKey(entityType))
-            {
-                // TODO: Figure out how to create Entity Pool of type T instead
-                _entities.Add(entityType, new EntityPool<Entity>());
-            }
-            _entities[entityType].newEntity(entity);
+            _entities[entityType].newEntity<T>();
         }
 
         public void unregisterEntity<T>(T entity) where T : Entity
@@ -89,14 +77,8 @@ namespace EcsyPort
             Type entityType = typeof(T);
             if (_entities.ContainsKey(entityType))
             {
-                _entities[entityType].removeEntity(entityId);
+                _entities[entityType].removeEntity<T>(entityId);
             }
-        }
-
-        // TODO: Wrong use of entityId, find the id in the list of entities and return that entity
-        public Entity getEntity(Type entityType, int entityId)
-        {
-            return _entities[entityType].getEntity(entityId);
         }
 
         public T getEntity<T>(int entityId) where T : Entity
@@ -106,10 +88,10 @@ namespace EcsyPort
             {
                 return null;
             }
-            return (T) (_entities[typeof(T)].getEntity(entityId));
+            return _entities[typeof(T)].getEntity<T>(entityId);
         }
 
-        public Dictionary<Type, EntityPool<Entity>> getEntities()
+        public Dictionary<Type, EntityPool> getEntities()
         {
             return _entities;
         }
@@ -120,27 +102,27 @@ namespace EcsyPort
         }
     }
 
-    public class EntityPool<T> where T : Entity, new()
+    public class EntityPool
     {
         private int entityCount;
 
-        private Dictionary<int, T> entitiesInUse;
-        private Dictionary<int, T> reserved;
+        private Dictionary<int, Entity> entitiesInUse;
+        private Dictionary<int, Entity> reserved;
 
         public EntityPool()
         {
             entityCount = 0;
-            entitiesInUse = new Dictionary<int, T>();
-            reserved = new Dictionary<int, T>();
+            entitiesInUse = new Dictionary<int, Entity>();
+            reserved = new Dictionary<int, Entity>();
         }
 
-        public T newEntity()
+        public T newEntity<T>() where T : Entity, new()
         {
             bool inReserve = reserved.Count > 0;
             if (inReserve)
             {
                 int key = reserved.Keys.First();
-                T e = reserved[key];
+                T e = (T) (reserved[key]);
                 entitiesInUse.Add(key, e);
                 return e;
             }
@@ -150,25 +132,12 @@ namespace EcsyPort
             return newEntity;
         }
 
-        public T newEntity(T entity)
+        public T getEntity<T>(int entityId) where T:Entity
         {
-            bool inUse = entitiesInUse.ContainsValue(entity);
-            bool inReserve = reserved.ContainsValue(entity);
-            if (inUse || inReserve)
-            {
-                return entity;
-            }
-            entity.ID = entityCount;
-            entityCount++;
-            return entity;
+            return (T) (entitiesInUse[entityId]);
         }
 
-        public T getEntity(int entityId)
-        {
-            return entitiesInUse[entityId];
-        }
-
-        public void removeEntity(T entity)
+        public void removeEntity(Entity entity)
         {
             if (!entitiesInUse.ContainsKey(entity.ID))
             {
@@ -178,26 +147,26 @@ namespace EcsyPort
             reserved.Add(entity.ID, entity);
         }
 
-        public void removeEntity(int entityId)
+        public void removeEntity<T>(int entityId) where T:Entity
         {
             if (!entitiesInUse.ContainsKey(entityId))
             {
                 return;
             }
-            T entity = entitiesInUse[entityId];
+            T entity = (T) (entitiesInUse[entityId]);
             entitiesInUse.Remove(entityId);
             reserved.Add(entity.ID, entity);
         }
 
-        public List<T> getActiveEntities()
+        public List<Entity> getActiveEntities()
         {
-            return entitiesInUse.Values.ToList<T>();
+            return entitiesInUse.Values.ToList<Entity>();
         }
 
-        public List<T> getAllEntities()
+        public List<Entity> getAllEntities()
         {
-            var inUse = entitiesInUse.Values.ToList<T>();
-            var res = reserved.Values.ToList<T>();
+            var inUse = entitiesInUse.Values.ToList<Entity>();
+            var res = reserved.Values.ToList<Entity>();
             inUse.AddRange(res);
             return inUse;
         }

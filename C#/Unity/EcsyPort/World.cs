@@ -46,9 +46,9 @@ namespace EcsyPort
             return systemManager.getSystems();
         }
 
-        public void registerEntity(Entity entity)
+        public void requestEntity<T>() where T : Entity, new()
         {
-            entityManager.registerEntity(entity);
+            entityManager.requestEntity<T>();
         }
 
         public void unregisterEntity(Entity entity)
@@ -56,15 +56,15 @@ namespace EcsyPort
             entityManager.unregisterEntity(entity);
         }
 
-        public Entity getEntity(Type entityType, int id)
+        public Entity getEntity<T>(int id) where T : Entity
         {
-            return entityManager.getEntity(entityType, id);
+            return entityManager.getEntity<T>(id);
         }
 
         public void execute(float deltaTime)
         {
             Dictionary<Type, System> systems = systemManager.getSystems();
-            Dictionary<Type, EntityPool<Entity>> entities = entityManager.getEntities();
+            Dictionary<Type, EntityPool> entities = entityManager.getEntities();
             foreach (Type systemKey in systems.Keys)
             {
                 foreach (Type entityKey in entities.Keys)
@@ -75,13 +75,6 @@ namespace EcsyPort
                     }
                 }
             }
-        }
-
-        // TODO: Query by IDs
-        public void execute(float deltaTime, params int[] entityIds)
-        {
-            Dictionary<Type, System> systems = systemManager.getSystems();
-            Dictionary<Type, EntityPool<Entity>> entities = entityManager.getEntities();
         }
 
         public string stats()
