@@ -44,8 +44,8 @@ I reviewed the features of ActiveMQ, RabbitMQ and Apache Kafka. Firstly as Activ
 ## ActiveMQ vs RabbitMQ
 | Comparator        | ActiveMQ                                         | RabbitMQ                                                      |
 |-------------------|--------------------------------------------------|---------------------------------------------------------------|
-| Throughput        | 3.8K Messages/s                                  | 4.3K Messages/s                                               |
-| Number of Brokers | 2 Brokers with P2P architecture                  | 1 Broker                                                      |
+| [Throughput](https://medium.com/@ghogare.dhananjay/rabbit-mq-vs-active-mq-cbfec9ec359f)        | 3.8K Messages/s                                  | 4.3K Messages/s                                               |
+| [Number of Brokers](https://www.educba.com/activemq-vs-rabbitmq/) | 2 Brokers with P2P architecture                  | 1 Broker                                                      |
 | Language Support  | C, C#, Haxe, Node.js, Perl, Racket, Python, Ruby | Java, Ruby, Python, PHP, Perl, Rust, Go, JS, C, C++           |
 | Message Patterns  | Pub/Sub<br>Message Queue                         | Pub/Sub<br>Message Queue<br>Remote Procedural Call<br>Routing |
 
