@@ -33,7 +33,13 @@ Given the problems that arose while trying to install and run Kafka, I had to re
 I reviewed the features of ActiveMQ, RabbitMQ and Apache Kafka. Firstly as ActiveMQ and RabbitMQ are fairly similar, I will first compare them with Apache Kafka. Then I will compare the differences between ActiveMQ and RabbitMQ.
 
 ## ActiveMQ, RabbitMQ vs Kafka
-
+| Comparator         | ActiveMQ/RabbitMQ                               | Kafka                                                         |
+|--------------------|-------------------------------------------------|---------------------------------------------------------------|
+| Payload Size       | Large JSON/XML                                  | Small Key-Value Pairs, values are usually small atomic values |
+| Data Flow          | Distinct bounded messages                       | Unbounded continuous flow                                     |
+| Throughput         | 4K(Persistent) - 10K(Non-Persistent) Messages/s | 100K-1M Messages/s                                            |
+| Uses               | Transactional Data                              | Operational Data                                              |
+| Supported Topology | Point-to-Point<br>Pub/Sub<br>Exchange           | Pub/Sub                                                       |
 
 ## ActiveMQ vs RabbitMQ
 
