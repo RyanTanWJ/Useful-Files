@@ -42,6 +42,12 @@ I reviewed the features of ActiveMQ, RabbitMQ and Apache Kafka. Firstly as Activ
 | Supported Topology | Point-to-Point<br>Pub/Sub<br>Exchange           | Pub/Sub                                                       |
 
 ## ActiveMQ vs RabbitMQ
-
+| Comparator        | ActiveMQ                                         | RabbitMQ                                                      |
+|-------------------|--------------------------------------------------|---------------------------------------------------------------|
+| [Throughput](https://medium.com/@ghogare.dhananjay/rabbit-mq-vs-active-mq-cbfec9ec359f)        | 3.8K Messages/s                                  | 4.3K Messages/s                                               |
+| [Number of Brokers](https://www.educba.com/activemq-vs-rabbitmq/) | 2 Brokers with P2P architecture                  | 1 Broker                                                      |
+| Language Support  | C, C#, Haxe, Node.js, Perl, Racket, Python, Ruby | Java, Ruby, Python, PHP, Perl, Rust, Go, JS, C, C++           |
+| Message Patterns  | Pub/Sub<br>Message Queue                         | Pub/Sub<br>Message Queue<br>Remote Procedural Call<br>Routing |
 
 # Final Evaluation
+Given the amount of effort it would require to learn and adopt Apache Kafka, and seeing no benefits beyond scalability, I cannot find a suitable reason to use it at this time.
