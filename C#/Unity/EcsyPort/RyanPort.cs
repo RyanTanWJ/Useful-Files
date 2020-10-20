@@ -53,14 +53,14 @@ namespace EcsyPort
             _entities = new Dictionary<Type, EntityPool>();
         }
 
-        public void requestEntity<T>() where T : Entity, new()
+        public T requestEntity<T>() where T : Entity, new()
         {
             Type entityType = typeof(T);
             if (!_entities.ContainsKey(entityType))
             {
                 _entities.Add(entityType, new EntityPool());
             }
-            _entities[entityType].newEntity<T>();
+            return _entities[entityType].newEntity<T>();
         }
 
         public void unregisterEntity<T>(T entity) where T : Entity
@@ -122,19 +122,20 @@ namespace EcsyPort
             if (inReserve)
             {
                 int key = reserved.Keys.First();
-                T e = (T) (reserved[key]);
+                T e = (T)(reserved[key]);
                 entitiesInUse.Add(key, e);
                 return e;
             }
             var newEntity = new T();
             newEntity.ID = entityCount;
+            entitiesInUse.Add(newEntity.ID, newEntity);
             entityCount++;
             return newEntity;
         }
 
-        public T getEntity<T>(int entityId) where T:Entity
+        public T getEntity<T>(int entityId) where T : Entity
         {
-            return (T) (entitiesInUse[entityId]);
+            return (T)(entitiesInUse[entityId]);
         }
 
         public void removeEntity(Entity entity)
@@ -147,13 +148,13 @@ namespace EcsyPort
             reserved.Add(entity.ID, entity);
         }
 
-        public void removeEntity<T>(int entityId) where T:Entity
+        public void removeEntity<T>(int entityId) where T : Entity
         {
             if (!entitiesInUse.ContainsKey(entityId))
             {
                 return;
             }
-            T entity = (T) (entitiesInUse[entityId]);
+            T entity = (T)(entitiesInUse[entityId]);
             entitiesInUse.Remove(entityId);
             reserved.Add(entity.ID, entity);
         }

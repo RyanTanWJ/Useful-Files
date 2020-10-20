@@ -46,9 +46,9 @@ namespace EcsyPort
             return systemManager.getSystems();
         }
 
-        public void requestEntity<T>() where T : Entity, new()
+        public T requestEntity<T>() where T : Entity, new()
         {
-            entityManager.requestEntity<T>();
+            return entityManager.requestEntity<T>();
         }
 
         public void unregisterEntity(Entity entity)
