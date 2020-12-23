@@ -18,6 +18,14 @@ func main() {
 	myMap["try"] = 1
 	fmt.Printf("My Map: %v\n", myMap)
 
+	fmt.Println("Assigned \"this\" to 2 in My Map")
+	myMap["this"] = 2
+	fmt.Printf("My Map: %v\n", myMap)
+
+	fmt.Println("Assigned \"out\" to 3 in My Map")
+	myMap["out"] = 3
+	fmt.Printf("My Map: %v\n", myMap)
+
 	// Modifying
 	fmt.Println("Modified \"foo\" to 3 in My Map 2")
 	myMap2["foo"] = 3
@@ -31,4 +39,15 @@ func main() {
 	// Assigning to nil map
 	// myMap3["this"] = 3 // This line throws an error
 	fmt.Println("This line throws an error: myMap3[\"this\"] = 3")
+
+	// Iterating over maps
+	fmt.Println("Iterating and printing key-value pairs in My Map")
+	for k, v := range myMap {
+		fmt.Printf("Key: %s, Value: %v\n", k, v)
+	}
+
+	fmt.Println("Iterating and printing keys in My Map")
+	for k := range myMap {
+		fmt.Printf("Key: %s\n", k)
+	}
 }
