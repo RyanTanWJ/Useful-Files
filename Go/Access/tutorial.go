@@ -1,7 +1,7 @@
 package main
 
 import (
-	"access"
+	"access/access"
 	"fmt"
 )
 
@@ -9,5 +9,5 @@ import (
 func main() {
 	fmt.Println()
 	access.AccessMethod()
-	access.noAccessMethod()
+	// access.noAccessMethod() // This method cannot be accessed as it is not exported
 }
