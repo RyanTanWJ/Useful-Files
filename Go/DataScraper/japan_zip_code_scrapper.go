@@ -13,13 +13,13 @@ import (
 )
 
 type Prefectures struct {
-	PrefectureMap map[string]*PrefectureInfo `json:"prefectures" yaml:"prefectures"`
+	PrefectureMap map[string][]PrefectureInfo `json:"prefectures" yaml:"prefectures"`
 }
 
 type PrefectureInfo struct {
-	KanaName       string          `json:"kana_name" yaml:"kana_name"`
-	ZipCodes       []string        `json:"zip_codes" yaml:"zip_codes"`
-	FirstTwoDigits map[string]bool `json:"first_two_digits" yaml:"first_two_digits"`
+	Name     string `json:"name" yaml:"name"`
+	KanaName string `json:"kana_name" yaml:"kana_name"`
+	// ZipCodes []string `json:"zip_codes" yaml:"zip_codes"`
 }
 
 const (
@@ -30,11 +30,8 @@ const (
 func main() {
 	prefectures := makeJapanPrefecturesMap()
 
-	outputData := &Prefectures{PrefectureMap: map[string]*PrefectureInfo{}}
+	outputData := &Prefectures{PrefectureMap: map[string][]PrefectureInfo{}}
 	for prefName, prefKanaName := range prefectures {
-
-		// Create the struct
-		prefInfo := &PrefectureInfo{KanaName: prefKanaName, FirstTwoDigits: map[string]bool{}}
 
 		// GET Request
 		webUrl := fmt.Sprintf("%s%s%s", japanZipCodesUrl, prefName, endUrl)
@@ -56,19 +53,26 @@ func main() {
 			re := regexp.MustCompile("[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]")
 			match := re.FindStringSubmatch(token.Data)
 			if len(match) > 0 {
+
+				// Create the struct
+				prefInfo := PrefectureInfo{Name: prefName, KanaName: prefKanaName}
+
+				// Parse zip code
 				zipCode := match[0]
 				zipCode = strings.Replace(zipCode, "-", "", -1)
-				prefInfo.ZipCodes = append(prefInfo.ZipCodes, zipCode)
+				// prefInfo.ZipCodes = append(prefInfo.ZipCodes, zipCode)
+
+				// Parse first 2 digits
 				first2digits := zipCode[:2]
-				if _, ok := prefInfo.FirstTwoDigits[first2digits]; !ok {
-					prefInfo.FirstTwoDigits[first2digits] = true
+
+				if !isDuplicate(prefInfo, outputData.PrefectureMap[first2digits]) {
+					outputData.PrefectureMap[first2digits] = append(outputData.PrefectureMap[first2digits], prefInfo)
 				}
 			}
 			if token.Type == html.ErrorToken {
 				break
 			}
 		}
-		outputData.PrefectureMap[prefName] = prefInfo
 	}
 
 	// JSON output
@@ -150,4 +154,13 @@ func makeJapanPrefecturesMap() map[string]string {
 		"Yamaguchi": "山口県",
 		"Yamanashi": "山梨県",
 	}
+}
+
+func isDuplicate(prefInfo PrefectureInfo, infoList []PrefectureInfo) bool {
+	for _, existingInfo := range infoList {
+		if prefInfo == existingInfo {
+			return true
+		}
+	}
+	return false
 }
