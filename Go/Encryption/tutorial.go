@@ -47,7 +47,7 @@ func encrypt(data []byte, passphrase string) []byte {
 	return ciphertext
 }
 
-func decrypt(data []byte, passphrase string) []byte] {
+func decrypt(data []byte, passphrase string) []byte {
 	hashedPass := createHash(passphrase)
 	key := []byte(hashedPass)
 
@@ -89,5 +89,5 @@ func main() {
 
 	// Decrypt
 	plaintext := decrypt(ciphertext, password)
-	fmt.Printf("My decrypted ciphertext:\n%s\n", plaintext)
+	fmt.Printf("My decrypted ciphertext:\n%s\n", string(plaintext))
 }
