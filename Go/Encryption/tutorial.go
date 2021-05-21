@@ -8,6 +8,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 )
 
 const (
@@ -45,7 +47,7 @@ func encrypt(data []byte, passphrase string) []byte {
 	return ciphertext
 }
 
-func decrypt(data []byte, passphrase string) string {
+func decrypt(data []byte, passphrase string) []byte] {
 	hashedPass := createHash(passphrase)
 	key := []byte(hashedPass)
 
@@ -65,12 +67,24 @@ func decrypt(data []byte, passphrase string) string {
 	if err != nil {
 		panic(err)
 	}
-	return string(plaintext)
+	return plaintext
 }
 
+func encryptFile(filename string, data []byte, passphrase string) {
+	f, _ := os.Create(filename)
+	defer f.Close()
+	f.Write(encrypt(data, passphrase))
+}
+
+func decryptFile(filename string, passphrase string) []byte {
+	data, _ := ioutil.ReadFile(filename)
+	return decrypt(data, passphrase)
+}
+
+// Adapted from https://www.youtube.com/watch?v=jgTqR8PuWuU
 func main() {
 	// Encrypt
-	ciphertext := encrypt([]byte("Encrypt this"), "password")
+	ciphertext := encrypt([]byte("Encrypt this"), password)
 	fmt.Printf("My encrypted plaintext:\n%s\n", ciphertext)
 
 	// Decrypt
