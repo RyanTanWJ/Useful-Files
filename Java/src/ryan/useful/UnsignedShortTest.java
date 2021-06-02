@@ -1,3 +1,5 @@
+package ryan.useful;
+
 import java.nio.ByteBuffer;
 
 public class UnsignedShortTest{
