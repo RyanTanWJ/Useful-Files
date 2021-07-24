@@ -1,9 +1,6 @@
 package com.ryan.user.service.ryanuserservice.datastore.config;
 
-import com.ryan.user.service.ryanuserservice.datastore.document.Users;
 import com.ryan.user.service.ryanuserservice.datastore.repository.UserRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 

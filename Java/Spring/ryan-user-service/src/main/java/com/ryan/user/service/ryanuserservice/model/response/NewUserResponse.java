@@ -4,6 +4,20 @@ public class NewUserResponse extends BaseResponse {
     private String name;
     private String userName;
 
+    public NewUserResponse(String name, String userName) {
+        this.name = name;
+        this.userName = userName;
+        this.success = true;
+        this.message = "new user successfully created";
+    }
+
+    public NewUserResponse(String name, String userName, String message) {
+        this.name = name;
+        this.userName = userName;
+        this.success = true;
+        this.message = message;
+    }
+
     public String getName() {
         return name;
     }

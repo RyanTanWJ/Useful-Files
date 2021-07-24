@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Users {
+public class User {
 
     @Id
     private Integer id;
@@ -12,7 +12,7 @@ public class Users {
     private String userName;
     private Long createdAt;
 
-    public Users(Integer id, String name, String userName, Long createdAt) {
+    public User(Integer id, String name, String userName, Long createdAt) {
         this.id = id;
         this.name = name;
         this.userName = userName;
