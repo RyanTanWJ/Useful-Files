@@ -1,20 +1,19 @@
 package com.ryan.user.service.ryanuserservice.controller;
 
+import com.ryan.user.service.ryanuserservice.Exceptions.DuplicateResourcesException;
 import com.ryan.user.service.ryanuserservice.Exceptions.ResourceNotFoundException;
 import com.ryan.user.service.ryanuserservice.Exceptions.TestException;
+import com.ryan.user.service.ryanuserservice.common.Util;
 import com.ryan.user.service.ryanuserservice.datastore.document.User;
 import com.ryan.user.service.ryanuserservice.datastore.repository.UserRepository;
 import com.ryan.user.service.ryanuserservice.model.request.NewUserRequest;
 import com.ryan.user.service.ryanuserservice.model.response.*;
-//import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.nio.ByteBuffer;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
@@ -39,7 +38,7 @@ public class UsersController {
             return new ResponseEntity<GetAllUsersResponse>(response, HttpStatus.OK);
         } catch (ResourceNotFoundException exc) {
             ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.NoUserContent, "No User Content");
-            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.NO_CONTENT); // TODO: No Content gives no body in response
         } catch (Exception exc) {
             HashMap<String, Object> metadata = new HashMap<String, Object>();
             metadata.put("exception", exc); // TODO: Putting exception includes entire meta data. Solution this.
@@ -48,18 +47,23 @@ public class UsersController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity findUserById(@PathVariable("id") int userId) {
+    @GetMapping("/{username}")
+    public ResponseEntity findUserById(@PathVariable("username") String username) {
         try {
-            Optional<User> foundUser = userRepository.findById(userId);
-            if (!foundUser.isPresent()) {
+            List<User> foundUsers = userRepository.findByUserName(username);
+            if (foundUsers.size() < 1) {
                 throw new ResourceNotFoundException();
+            } else if (foundUsers.size() < 1) {
+                throw new DuplicateResourcesException();
             }
-            GetUserResponse response = new GetUserResponse(foundUser.get());
+            GetUserResponse response = new GetUserResponse(foundUsers.get(0));
             return new ResponseEntity<GetUserResponse>(response, HttpStatus.OK);
         } catch (ResourceNotFoundException exc) {
             ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.UserNotFound, "User Not Found");
-            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.NO_CONTENT);
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.NOT_FOUND);
+        } catch (DuplicateResourcesException exc) {
+            ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.DuplicateUsersFound, "Internal Server Error");
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception exc) {
             HashMap<String, Object> metadata = new HashMap<String, Object>();
             metadata.put("exception", exc); // TODO: Putting exception includes entire meta data. Solution this.
@@ -71,11 +75,16 @@ public class UsersController {
     @PostMapping("/new")
     public ResponseEntity createNewUser(@RequestBody NewUserRequest newUserRequest) {
         try {
+            // TODO: When creating user ensure no duplicate user name
+            Date now = new Date();
+            ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+            buffer.putLong(now.getTime());
+            String uid = "RTUS-" + Util.bytesToHex(buffer.array());
             User newUser = new User(
-                    1,
+                    uid,
                     newUserRequest.getName(),
                     newUserRequest.getUserName(),
-                    System.currentTimeMillis() / 1000L);
+                    now.getTime());
 
             this.userRepository.save(newUser);
             NewUserResponse response = new NewUserResponse(newUser.getName(), newUser.getUserName());

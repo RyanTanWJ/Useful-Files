@@ -9,6 +9,7 @@ public class ExceptionCodes {
     // HTTP Not Found
     public static int UserNotFound = HttpStatus.NOT_FOUND.value() * 100 + 1;
 
-    // HTTP Unknown Error
+    // HTTP Internal Server Error
     public static int UnknownError = HttpStatus.INTERNAL_SERVER_ERROR.value() * 100 + 1;
+    public static int DuplicateUsersFound = HttpStatus.INTERNAL_SERVER_ERROR.value() * 100 + 2;
 }
