@@ -48,12 +48,12 @@ public class UsersController {
     }
 
     @GetMapping("/{username}")
-    public ResponseEntity findUserById(@PathVariable("username") String username) {
+    public ResponseEntity findByUserName(@PathVariable("username") String username) {
         try {
             List<User> foundUsers = userRepository.findByUserName(username);
             if (foundUsers.size() < 1) {
                 throw new ResourceNotFoundException();
-            } else if (foundUsers.size() < 1) {
+            } else if (foundUsers.size() > 1) {
                 throw new DuplicateResourcesException();
             }
             GetUserResponse response = new GetUserResponse(foundUsers.get(0));
@@ -87,11 +87,38 @@ public class UsersController {
                     now.getTime());
 
             this.userRepository.save(newUser);
-            NewUserResponse response = new NewUserResponse(newUser.getName(), newUser.getUserName());
+            NewUserResponse response = new NewUserResponse(newUser.getUserId(), newUser.getName(), newUser.getUserName());
             return new ResponseEntity<NewUserResponse>(response, HttpStatus.OK);
         } catch (Exception e) {
             HashMap<String, Object> metadata = new HashMap<String, Object>();
             metadata.put("exception", e); // TODO: Putting exception includes entire meta data. Solution this.
+            ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.UnknownError, "Internal Server Error", metadata);
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // TODO: Figure out why throwing "java.lang.IllegalStateException: Required identifier property not found for class User"
+    @DeleteMapping("/terminate/{userId}")
+    public ResponseEntity deleteUserByUserId(@PathVariable("userId") String userId) {
+        try {
+            List<User> usersDeleted = this.userRepository.deleteByUserId(userId);
+            if (usersDeleted.size() < 1) {
+                throw new ResourceNotFoundException();
+            } else if (usersDeleted.size() > 1) {
+                throw new DuplicateResourcesException();
+            }
+            User deletedUser = usersDeleted.get(0);
+            DeleteUserResponse response = new DeleteUserResponse(deletedUser.getUserId(), deletedUser.getName(), deletedUser.getUserName());
+            return new ResponseEntity<DeleteUserResponse>(response, HttpStatus.OK);
+        } catch (ResourceNotFoundException exc) {
+            ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.UserNotFound, "User Not Found");
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.NOT_FOUND);
+        } catch (DuplicateResourcesException exc) {
+            ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.DuplicateUsersFound, "Internal Server Error");
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            HashMap<String, Object> metadata = new HashMap<String, Object>();
+            metadata.put("exception", e.printStackTrace();); // TODO: Putting exception includes entire meta data. Solution this.
             ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.UnknownError, "Internal Server Error", metadata);
             return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         }

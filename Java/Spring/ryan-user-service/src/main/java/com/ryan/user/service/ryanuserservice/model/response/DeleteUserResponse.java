@@ -1,19 +1,19 @@
 package com.ryan.user.service.ryanuserservice.model.response;
 
-public class NewUserResponse extends BaseResponse {
+public class DeleteUserResponse extends BaseResponse {
     private String userId;
     private String name;
     private String userName;
 
-    public NewUserResponse(String userId, String name, String userName) {
+    public DeleteUserResponse(String userId, String name, String userName) {
         this.userId = userId;
         this.name = name;
         this.userName = userName;
         this.success = true;
-        this.message = "new user successfully created";
+        this.message = "user successfully deleted";
     }
 
-    public NewUserResponse(String userId, String name, String userName, String message) {
+    public DeleteUserResponse(String userId, String name, String userName, String message) {
         this.userId = userId;
         this.name = name;
         this.userName = userName;
@@ -47,7 +47,7 @@ public class NewUserResponse extends BaseResponse {
 
     @Override
     public String toString() {
-        return "NewUserResponse{" +
+        return "DeleteUserResponse{" +
                 "success=" + success +
                 ", message='" + message + '\'' +
                 ", userId='" + userId + '\'' +
