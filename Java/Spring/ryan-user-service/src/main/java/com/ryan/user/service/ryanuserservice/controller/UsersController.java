@@ -8,6 +8,7 @@ import com.ryan.user.service.ryanuserservice.datastore.document.User;
 import com.ryan.user.service.ryanuserservice.datastore.repository.UserRepository;
 import com.ryan.user.service.ryanuserservice.model.request.NewUserRequest;
 import com.ryan.user.service.ryanuserservice.model.response.*;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -96,8 +97,7 @@ public class UsersController {
             return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    // TODO: Figure out why throwing "java.lang.IllegalStateException: Required identifier property not found for class User"
+    
     @DeleteMapping("/terminate/{userId}")
     public ResponseEntity deleteUserByUserId(@PathVariable("userId") String userId) {
         try {
@@ -118,7 +118,7 @@ public class UsersController {
             return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             HashMap<String, Object> metadata = new HashMap<String, Object>();
-            metadata.put("exception", e.printStackTrace();); // TODO: Putting exception includes entire meta data. Solution this.
+            metadata.put("exception", e.getStackTrace()); // TODO: Putting exception includes entire meta data. Solution this.
             ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.UnknownError, "Internal Server Error", metadata);
             return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
