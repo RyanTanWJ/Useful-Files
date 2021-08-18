@@ -76,7 +76,11 @@ public class UsersController {
     @PostMapping("/new")
     public ResponseEntity createNewUser(@RequestBody NewUserRequest newUserRequest) {
         try {
-            // TODO: When creating user ensure no duplicate user name
+            List<User> existingUsers = userRepository.findByUserName(newUserRequest.getUserName());
+            if (existingUsers.size() > 0) {
+                throw new DuplicateResourcesException();
+            }
+
             Date now = new Date();
             ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
             buffer.putLong(now.getTime());
@@ -90,6 +94,9 @@ public class UsersController {
             this.userRepository.save(newUser);
             NewUserResponse response = new NewUserResponse(newUser.getUserId(), newUser.getName(), newUser.getUserName());
             return new ResponseEntity<NewUserResponse>(response, HttpStatus.OK);
+        } catch (DuplicateResourcesException e) {
+            ExceptionResponse excResp = new ExceptionResponse(ExceptionCodes.DuplicateUsersFound, "That username has already been taken. Please choose another.");
+            return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             HashMap<String, Object> metadata = new HashMap<String, Object>();
             metadata.put("exception", e); // TODO: Putting exception includes entire meta data. Solution this.
@@ -97,7 +104,7 @@ public class UsersController {
             return new ResponseEntity<ExceptionResponse>(excResp, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     @DeleteMapping("/terminate/{userId}")
     public ResponseEntity deleteUserByUserId(@PathVariable("userId") String userId) {
         try {
